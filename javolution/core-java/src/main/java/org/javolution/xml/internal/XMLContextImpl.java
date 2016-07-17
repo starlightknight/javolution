@@ -35,7 +35,7 @@ public final class XMLContextImpl extends XMLContext {
 
     // Holds class->format mapping. 
     private final FastMap<Class<?>, XMLFormat<?>> 
-         classToFormat = new SparseMap<Class<?>, XMLFormat<?>>().shared();
+         classToFormat = FastMap.newMap().shared().unchecked();
 
     // Holds parent (null if root).
     private final XMLContextImpl parent;

@@ -45,7 +45,7 @@ public class FastSetTest {
 	
 	@Test
 	public void testCaseInsensitiveSetWithLexicalCaseInsensitive(){
-		_fastSet = FastSet.newSet(Order.LEXICAL_CASE_INSENSITIVE);
+		_fastSet = FastSet.newSet(Order.CHARS_LEXICAL_CASE_INSENSITIVE);
 		_fastSet.add("Test");
 		
 		assertTrue("Set Contains Test", _fastSet.contains("Test"));

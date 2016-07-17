@@ -41,7 +41,7 @@ public final class ConstantMap<K,V> extends FastMap<K,V> {
     	sparse.put(firstKey, firstValue);
     	for (int i=0; i < others.length; i++) 
     		sparse.put((K)others[i], (V)others[++i]);
-    	return new ConstantMap<K,V>(sparse, Equality.DEFAULT);
+    	return new ConstantMap<K,V>(sparse, Equality.STANDARD);
     }
 	
 	/** Holds the mapping. */

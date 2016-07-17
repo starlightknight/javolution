@@ -31,7 +31,7 @@ public class SparseSet<E> extends FastSet<E> {
      * Creates an empty set using an arbitrary order (hash based).
      */
     public SparseSet() {
-    	this(Order.DEFAULT);
+    	this(Order.ARBITRARY);
     }
 	/**
      * Creates an empty set using the specified order.

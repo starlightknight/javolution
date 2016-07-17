@@ -20,10 +20,13 @@ import java.lang.annotation.Target;
  *     deterministic time behavior. The {@link #limit limit} indicator indicates 
  *     the evolution of the 
  *     <a href="http://en.wikipedia.org/wiki/Worst-case_execution_time">
- *     worst-case execution time</a> of a method with the size of the instance
- *     and its inputs (or only the size of the inputs for static methods).    
+ *     worst-case execution time</a> with the size of the instance
+ *     and its inputs (or only the size of the inputs for static methods).
  * <pre>{@code
+ * 
+ * // Applied to a method or constructor, it indicates the limit behavior of the method or constructor. 
  * public class FastCollection<E> {
+ * 
  *     {@literal@}Realtime(limit = LINEAR)
  *     public boolean contains(Object obj) { ... }
  *     
@@ -32,6 +35,18 @@ import java.lang.annotation.Target;
  *     
  *     {@literal@}Realtime(limit = LINEAR, comment = "Could count the elements (e.g. filtered view).")
  *     public abstract int size();
+ *     
+ * }
+ * 
+ * // Applied to a field or a class, it indicates the field or class methods/constructors worst behavior.
+ * public interface Order<T> extends Equality<T>, Comparator<T> {
+ * 
+ *      {@literal@}Realtime(limit = CONSTANT)  
+ *      public static final Order<Object> IDENTITY = ...;
+ * 
+ *      {@literal@}Realtime(limit = LINEAR)  
+ *      public static final Order<CharSequence> LEXICAL = ...;
+ * 
  * }}</pre></p>      
  *     
  * <p> Analysis tools / compilers may produce warnings if program elements 

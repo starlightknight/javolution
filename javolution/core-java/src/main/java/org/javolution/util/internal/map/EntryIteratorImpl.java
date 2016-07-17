@@ -8,9 +8,9 @@
  */
 package org.javolution.util.internal.map;
 
-import java.util.Map.Entry;
 
 import org.javolution.util.FastMap;
+import java.util.Map.Entry;
 import org.javolution.util.FastCollection.Iterator;
 
 /**

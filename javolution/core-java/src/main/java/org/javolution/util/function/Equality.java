@@ -34,10 +34,10 @@ import org.javolution.util.internal.function.NaturalOrderImpl;
 public interface Equality<T> extends Serializable {
 	
     /**
-     * A default object equality (based on {@link Object#equals}).
+     * The standard object equality (based on {@link Object#equals}).
      */
     @Realtime(limit = UNKNOWN)
-    public static final Order<Object> DEFAULT = HashOrderImpl.INSTANCE;
+    public static final Order<Object> STANDARD = HashOrderImpl.INSTANCE;
 
     /**
      * An identity object equality (instances are only equals to themselves).
@@ -48,7 +48,7 @@ public interface Equality<T> extends Serializable {
 
      /**
      * A content based array comparator (recursive). 
-     * The {@link #DEFAULT default} equality is used for non-array elements. 
+     * The {@link #STANDARD standard} equality is used for non-array elements. 
      */
     @Realtime(limit = LINEAR)
     public static final Equality<Object> ARRAY = ArrayEqualityImpl.INSTANCE;
@@ -57,14 +57,28 @@ public interface Equality<T> extends Serializable {
      * A lexical equality for any {@link CharSequence}.
      */
     @Realtime(limit = LINEAR)
-    public static final Order<CharSequence> LEXICAL
+    public static final Order<String> LEXICAL
+        = null; // TODO
+
+    /**
+     * A case insensitive lexical equality for any {@link CharSequence}.
+     */
+    @Realtime(limit = LINEAR)
+    public static final Order<String> LEXICAL_CASE_INSENSITIVE
+        = null; // TODO
+  
+    /**
+     * A lexical equality for any {@link CharSequence}.
+     */
+    @Realtime(limit = LINEAR)
+    public static final Order<CharSequence> CHARS_LEXICAL
         = LexicalOrderImpl.INSTANCE;
 
     /**
      * A case insensitive lexical equality for any {@link CharSequence}.
      */
     @Realtime(limit = LINEAR)
-    public static final Order<CharSequence> LEXICAL_CASE_INSENSITIVE
+    public static final Order<CharSequence> CHARS_LEXICAL_CASE_INSENSITIVE
         = CaseInsensitiveLexicalOrderImpl.INSTANCE;
   
     /**

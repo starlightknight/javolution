@@ -13,6 +13,7 @@ import static org.javolution.lang.Realtime.Limit.LINEAR;
 
 import java.util.NavigableSet;
 
+import org.javolution.lang.Parallel;
 import org.javolution.lang.Realtime;
 import org.javolution.util.function.Order;
 import org.javolution.util.function.Predicate;
@@ -33,20 +34,22 @@ import org.javolution.util.function.Predicate;
  * <p> Instances of this class can advantageously replace {@code java.util.*} 
  *     sets in terms of adaptability, space or performance. 
  * <pre>{@code
- * FastSet<Foo> hashSet = FastSet.newSet(); // Hash order. 
+ * FastSet<Foo> hashSet = FastSet.newSet(); // Equivalent to FastSet.newSet(Order.ARBITRARY)
  * FastSet<Foo> identityHashSet = FastSet.newSet(Order.IDENTITY);
  * FastSet<String> treeSet = FastSet.newSet(Order.LEXICAL); 
- * FastSet<Foo> linkedHashSet = new SparseSet<Foo>().linked(); // Insertion order.
- * FastSet<Foo> concurrentHashSet = new SparseSet<Foo>().shared(); 
- * FastSet<String> concurrentSkipListSet = new SparseSet<String>(Order.LEXICAL).shared();
- * FastSet<Foo> copyOnWriteArraySet = new SparseSet<Foo>().atomic();
+ * FastSet<Foo> linkedHashSet = FastSet.newSet().linked().unchecked(); // Insertion order.
+ * FastSet<Foo> concurrentHashSet = FastSet.newSet().shared().unchecked(); 
+ * FastSet<String> concurrentSkipListSet = FastSet.newSet(Order.LEXICAL).shared();
+ * FastSet<Foo> copyOnWriteArraySet = FastSet.newSet().atomic().unchecked();
  * ...
- * }</pre> </p>
+ * // Collection with initial values.
+ * FastSet<String> unordered = FastSet.newSet().addAll("John Deuff", "Otto Graf", "Sim Kamil").unchecked();
+ * }</pre></p>
  * 
  * <p> This class inherits all the {@link FastCollection} views and support 
  *     the new {@link #subSet subSet} view over a portion of the set.
  * <pre>{@code
- * FastSet<String> names = FastSet.newSet(Equality.LEXICAL); 
+ * FastSet<String> names = FastSet.newSet(Order.LEXICAL); 
  * ...
  * names.subSet("A", "B").clear(); // Removes the names starting with "A"  (see java.util.SortedSet.subSet specification).
  * names.filter(str -> str.length < 5).clear(); // Removes all short name (Java 8 notation).
@@ -71,7 +74,7 @@ public abstract class FastSet<E> extends FastCollection<E> implements NavigableS
     /**
      * Returns a new high-performance set sorted arbitrarily (hash order).
      */
-    public static <E> FastSet<E> newSet() {
+    public static <E> SparseSet<E> newSet() {
     	return new SparseSet<E>();
     }
 
@@ -79,7 +82,7 @@ public abstract class FastSet<E> extends FastCollection<E> implements NavigableS
      * Returns a new high-performance set sorted according to the specified
      * comparator.
      */
-    public static <E> FastSet<E> newSet(Order<? super E> comparator) {
+    public static <E> SparseSet<E> newSet(Order<? super E> comparator) {
     	return new SparseSet<E>(comparator);
     }
 
@@ -195,10 +198,19 @@ public abstract class FastSet<E> extends FastCollection<E> implements NavigableS
     // Misc.
     //
 	
-    @Override
-    public FastSet<E> all() {
-    	return (FastSet<E>) super.all();
-    }
+	/**
+	 * Returns a high-performance set (not a view) holding the same elements as 
+	 * this set. The set returned has the same {@link #comparator comparator}
+	 * as this set. 
+	 */
+	@Override
+	@Parallel
+	@Realtime(limit = LINEAR)
+	public SparseSet<E> all() {
+		SparseSet<E> result = new SparseSet<E>(comparator());
+		result.addAll(this);
+		return result;
+	}
     
 	@Override
 	public ConstantSet<E> constant() {
@@ -220,6 +232,21 @@ public abstract class FastSet<E> extends FastCollection<E> implements NavigableS
 	
 	@Override
 	public abstract FastSet<E> clone();
+
+	/**
+	 * Unchecked parameterized type conversion.
+	 * This method is typically used with static factories to ensure that 
+	 * the set is of the expected type. For example:
+     * <p><pre>{@code
+     * FastSet<Foo> linkedHashSet = FastSet.newSet().linked().unchecked();
+     * FastSet<String> unordered = FastSet.newSet(Order.ARBITRARY)
+    	     .addAll("John Deuff", "Otto Graf", "Sim Kamil").unchecked();
+     * }</pre></p>
+	 */
+    @SuppressWarnings("unchecked")
+	public <X> FastSet<X> unchecked() {
+    	return (FastSet<X>) this;
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // SortedSet / NavigableSet Interface.

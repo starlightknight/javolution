@@ -39,7 +39,7 @@ public final class ConstantTable<E> extends FastTable<E> {
      * the specified elements. 
      */
 	public static <E> ConstantTable<E> of(@SuppressWarnings("unchecked") E... elements) {
-    	return new ConstantTable<E>(elements.clone(), Equality.DEFAULT);
+    	return new ConstantTable<E>(elements.clone(), Equality.STANDARD);
     }
 
 	/** Holds the elements. */

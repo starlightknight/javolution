@@ -54,6 +54,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 	private static final long serialVersionUID = 0x700L; // Version. 
 	private static final Object SUB_MAP = new Object();
 	private final Order<? super K> comparator; 
+	private final Equality<? super V> valuesEquality; 
 	private Node<K,V> root = NullNode.getInstance(); // Value is either V or FastMap<K,V>
 	private int size;
 	
@@ -61,7 +62,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
      * Creates an empty map using an arbitrary order (hash based).
      */
     public SparseMap() {
-    	this(Order.DEFAULT);
+    	this(Order.ARBITRARY);
     }
     
 	/**
@@ -70,7 +71,19 @@ public class SparseMap<K,V> extends FastMap<K,V> {
      * @param comparator the ordering of the map.
      */
     public SparseMap(Order<? super K> comparator) {
+    	this(comparator, Equality.STANDARD);
+    }
+        
+	/**
+     * Creates an empty map using the specified order and the specified 
+     * equality for its values.
+     * 
+     * @param comparator the ordering of the map.
+     * @param valuesEquality the equality comparator for the map values.
+     */
+    public SparseMap(Order<? super K> comparator, Equality<? super V> valuesEquality) {
     	this.comparator = comparator;
+    	this.valuesEquality = valuesEquality;
     }
         
 	@Override
@@ -85,7 +98,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 	
 	@Override
 	public Equality<? super V> valuesEquality() {
-		return Equality.DEFAULT;
+		return valuesEquality;
 	}
 	
 	@Override
@@ -130,7 +143,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 		} 
 		// Existing entry.
 		if (comparator.areEqual(entry.key, key))
-			return entry.setValueBypass(value);
+			return entry.setValuePrivate(value);
 		// Collision.
         Order<? super K> subOrder = comparator.subOrder(key);
         FastMap<K,V> subMap = (subOrder != null) ? 
@@ -201,7 +214,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 		} else {
 			if (comparator.compare(entry.key, key) > 0) return entry;
 		}
-		if (entry.getIndex() == -1) return null;
+		if (entry.indexValue() == -1) return null;
 		entry = root.ceilingEntry(i+1);
 		if ((entry != null) && (entry.key == SUB_MAP)) 
 			return ((FastMap<K,V>)entry.value).firstEntry();
@@ -220,7 +233,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 		} else {
 			if (comparator.compare(entry.key, key) < 0) return entry;
 		}
-		if (entry.getIndex() == 0) return null;
+		if (entry.indexValue() == 0) return null;
 		entry = root.floorEntry(i-1);
 		if ((entry != null) && (entry.key == SUB_MAP)) 
 			return ((FastMap<K,V>)entry.value).lastEntry();
@@ -239,7 +252,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 		} else {
 			if (comparator.compare(entry.key, key) >= 0) return entry;
 		}
-		if (entry.getIndex() == -1) return null;
+		if (entry.indexValue() == -1) return null;
 		entry = root.ceilingEntry(i+1);
 		if ((entry != null) && (entry.key == SUB_MAP)) 
 			return ((FastMap<K,V>)entry.value).firstEntry();
@@ -258,7 +271,7 @@ public class SparseMap<K,V> extends FastMap<K,V> {
 		} else {
 			if (comparator.compare(entry.key, key) <= 0) return entry;
 		}
-		if (entry.getIndex() == 0) return null;
+		if (entry.indexValue() == 0) return null;
 		entry = root.floorEntry(i-1);
 		if ((entry != null) && (entry.key == SUB_MAP)) 
 			return ((FastMap<K,V>)entry.value).lastEntry();

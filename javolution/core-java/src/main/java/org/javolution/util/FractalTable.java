@@ -36,13 +36,24 @@ public class FractalTable<E> extends FastTable<E> {
     private int capacity; 
     private FractalTableImpl fractal; // Null if empty (capacity 0)
     private int size;
+    private final Equality<? super E> equality;
 
     /**
      * Creates an empty table whose capacity increments/decrements smoothly
      * without large resize operations to best fit the table current size.
      */
     public FractalTable() {
+    	this(Equality.STANDARD);
     }
+    
+    /**
+     * Creates an empty table using the specified equality for elements 
+     * comparisons.
+     */
+    public FractalTable(Equality<? super E> equality) {
+    	this.equality = equality;
+    }
+    
  
     @Override
     public boolean add(E element) {
@@ -99,7 +110,7 @@ public class FractalTable<E> extends FastTable<E> {
 
     @Override
     public Equality<? super E> equality() {
-        return Equality.DEFAULT;
+        return equality;
     }
 
 	@SuppressWarnings("unchecked")

@@ -22,7 +22,7 @@ public class OrderTest {
 	
 	@Test
 	public void testLexical(){
-		boolean b = Order.LEXICAL_CASE_INSENSITIVE.areEqual("Toto", "ToTo");
+		boolean b = Order.CHARS_LEXICAL_CASE_INSENSITIVE.areEqual("Toto", "ToTo");
 		assertEquals("Lexical Case Insensitive", true, b);
 	}
 	

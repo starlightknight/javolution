@@ -35,12 +35,12 @@ public class SparseArray<E> extends FastMap<Index, E> {
 	/**
 	 * Custom entry holding an additional index field (unsigned 32-bits).
 	 */
-	public interface SparseEntry<K,V> extends Entry<K, V> {
+	public static abstract class SparseEntry<K,V> extends Entry<K, V> {
 		
 		/**
 		 * Returns the index of the entry (unsigned 32-bits value).
 		 */
-		int getIndex(); 
+		public abstract int indexValue(); 
 		
 	}
 
@@ -109,7 +109,7 @@ public class SparseArray<E> extends FastMap<Index, E> {
 			entry.key = Index.of(index);
 			size++;
 		}
-		return entry.setValue(element);
+		return entry.setValuePrivate(element);
 	}
 
 	/** Returns the sparse entry after the specified index or {@code null}
@@ -183,7 +183,7 @@ public class SparseArray<E> extends FastMap<Index, E> {
 
 	@Override
 	public Equality<? super E> valuesEquality() {
-		return Equality.DEFAULT;
+		return Equality.STANDARD;
 	}
 	
 	@Override
@@ -242,7 +242,7 @@ public class SparseArray<E> extends FastMap<Index, E> {
 	
 
 	/** Defines the entry (leaf node) */
-	static final class EntryNode<K,V> implements Node<K,V>, SparseEntry<K,V> {
+	static final class EntryNode<K,V> extends SparseEntry<K,V> implements Node<K,V> {
 	    private static final long serialVersionUID = 0x700L; // Version. 
         static final Object NOT_INITIALIZED = new Object();
 		private final int index;
@@ -313,9 +313,10 @@ public class SparseArray<E> extends FastMap<Index, E> {
 		// SparseEntry<K,V> Implementation.
 		
 		@Override
-		public int getIndex() {
+		public int indexValue() {
 			return index;
 		}
+		
 		@Override
 		public K getKey() {
 			return key;
@@ -326,15 +327,7 @@ public class SparseArray<E> extends FastMap<Index, E> {
 			return value;
 		}
 
-		/**
-		 * @deprecated
-		 */
-		@Override
-		public V setValue(V newValue) {
-			throw new UnsupportedOperationException();
-		}
-
-		V setValueBypass(V newValue) {
+		V setValuePrivate(V newValue) {
 			V previous = value;
 			value = newValue;
 			return previous;
@@ -346,13 +339,13 @@ public class SparseArray<E> extends FastMap<Index, E> {
 				return false;
 			@SuppressWarnings("unchecked")
 			Entry<K, V> that = (Entry<K, V>) obj;
-			return Order.DEFAULT.areEqual(key, that.getKey())
-					&& Order.DEFAULT.areEqual(value, that.getValue());
+			return Order.ARBITRARY.areEqual(key, that.getKey())
+					&& Order.ARBITRARY.areEqual(value, that.getValue());
 		}
 
 		@Override
 		public int hashCode() { // As per Map.Entry contract.
-			return Order.DEFAULT.indexOf(key) ^ Order.DEFAULT.indexOf(value);
+			return Order.ARBITRARY.indexOf(key) ^ Order.ARBITRARY.indexOf(value);
 		}
 
 		@Override

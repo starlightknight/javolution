@@ -22,6 +22,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.RandomAccess;
 
+import org.javolution.lang.Parallel;
 import org.javolution.lang.Realtime;
 import org.javolution.util.function.Equality;
 import org.javolution.util.internal.table.AtomicTableImpl;
@@ -44,7 +45,7 @@ import org.javolution.util.internal.table.UnmodifiableTableImpl;
  * <pre>{@code
  * FastTable<String> names = FastTable.newTable(); 
  * ...
- * names.sort(Order.LEXICAL_CASE_INSENSITIVE); // Sorts the names in place (different from sorted() which returns a sorted view).
+ * names.sort(Order.LEXICAL); // Sorts the names in place (different from sorted() which returns a sorted view).
  * names.subTable(0, names.size() / 2).clear(); // Removes the first half of the table (see java.util.List.subList specification).
  * names.filter(str -> str.startsWith("A")).clear(); // Removes all the names starting with "A" (Java 8 notation).
  * names.filter(str -> str.startsWith("A")).parallel().clear(); // Same as above but removal performed concurrently.
@@ -91,7 +92,7 @@ public abstract class FastTable<E> extends FastCollection<E> implements List<E>,
     /**
      * Returns a new high-performance table.
      */
-    public static <E> FastTable<E> newTable() {
+    public static <E> FractalTable<E> newTable() {
     	return new FractalTable<E>();
     }
 
@@ -99,8 +100,8 @@ public abstract class FastTable<E> extends FastCollection<E> implements List<E>,
      * Returns a new high-performance table using the specified equality
      * comparator for its elements.
      */
-    public static <E> FastTable<E> newTable(Equality<? super E> equality) {
-    	return new FractalTable<E>().equality(equality);
+    public static <E> FractalTable<E> newTable(Equality<? super E> equality) {
+    	return new FractalTable<E>(equality);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -475,9 +476,18 @@ public abstract class FastTable<E> extends FastCollection<E> implements List<E>,
     // Misc.
     //
 
+	/**
+	 * Returns a high-performance table (not a view) holding the same elements 
+	 * as this table. The table returned has the same {@link #equality equality}
+	 * as this table. 
+	 */
 	@Override
-	public FastTable<E> all() {
-		return (FastTable<E>) super.all();
+	@Parallel
+	@Realtime(limit = LINEAR)
+	public FractalTable<E> all() {
+		FractalTable<E> result = new FractalTable<E>(equality());
+		result.addAll(this);
+		return result;
 	}
 
 	@Override
@@ -529,6 +539,21 @@ public abstract class FastTable<E> extends FastCollection<E> implements List<E>,
     public void sort(Comparator<? super E> cmp) {
         QuickSortImpl<E> qs = new QuickSortImpl<E>(this, cmp);
         qs.sort();
+    }
+
+	/**
+	 * Unchecked parameterized type conversion.
+	 * This method is typically used with static factories to ensure that 
+	 * the table is of the expected type. For example:
+     * <p><pre>{@code
+     * FastTable<String> sharedNames = FastTable.newTable().shared().unchecked();
+     * FastTable<String> winners = FastTable.newTable()
+     *     .addAll("John Deuff", "Otto Graf", "Sim Kamil").unchecked();
+     * }</pre></p>
+	 */
+    @SuppressWarnings("unchecked")
+	public <X> FastTable<X> unchecked() {
+    	return (FastTable<X>) this;
     }
 
     /**

@@ -8,9 +8,8 @@
  */
 package org.javolution.util.internal.map;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
 import org.javolution.util.FastCollection;
 import org.javolution.util.FastMap;
@@ -20,9 +19,9 @@ import org.javolution.util.function.Order;
 import org.javolution.util.function.Predicate;
 
 /**
- * An entry set view over a map.
+ * An entry set view over a fast map.
  */
-public final class EntrySetImpl<K, V> extends FastSet<Map.Entry<K, V>> {
+public final class EntrySetImpl<K, V> extends FastSet<Entry<K, V>> {
 
 	/** The entry order */
 	private static class EntryOrder<K, V> implements Order<Entry<K, V>> {
@@ -78,16 +77,8 @@ public final class EntrySetImpl<K, V> extends FastSet<Map.Entry<K, V>> {
 
 	@Override
 	public boolean add(Entry<K, V> entry) {
-		Entry<K, V> existing = map.getEntry(entry.getKey());
-		if (existing != null) {
-			if (map.valuesEquality().areEqual(existing.getValue(),
-					entry.getValue()))
-				return false;
-			existing.setValue(entry.getValue());
-		} else { // No entry with the same key.
-			map.put(entry.getKey(), entry.getValue());
-		}
-		return true;
+		V previous = map.put(entry.getKey(), entry.getValue());
+		return !map.valuesEquality().areEqual(previous, entry.getValue());
 	}
 
 	@Override

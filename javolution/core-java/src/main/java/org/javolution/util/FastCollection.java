@@ -83,15 +83,14 @@ import org.javolution.util.internal.collection.UnmodifiableCollectionImpl;
  * FastCollection<String> names ...;
  * ConstantTable<String> namesToRemove = ConstantTable.of("Eva Poré");
  *      
- * names.equality(LEXICAL_CASE_INSENSITIVE).parallel().removeAll(namesToRemove); // Parallel removal.
- * names.parallel().equality(LEXICAL_CASE_INSENSITIVE).removeAll(namesToRemove); // Sequential removal.
+ * names.equality(Equality.LEXICAL_CASE_INSENSITIVE).parallel().removeAll(namesToRemove); // Parallel removal.
+ * names.parallel().equality(Equality.LEXICAL_CASE_INSENSITIVE).removeAll(namesToRemove); // Sequential removal.
  * 
  * FastCollection<String> atomic = names.sorted().atomic();
  * FastCollection<String> nonAtomic = names.atomic().sorted();
  * 
  * FastCollection<String> threadSafe = names.linked().shared();
  * FastCollection<String> threadUnsafe = names.shared().linked(); 
- *  
  * }</pre></p>
  * 
  * <p> It should be noted that {@link #unmodifiable Unmodifiable} views <b>are not
@@ -99,15 +98,12 @@ import org.javolution.util.internal.collection.UnmodifiableCollectionImpl;
  *     through class specializations (e.g. {@link ConstantTable}, {@link ConstantSet}, 
  *     {@link ConstantMap}, ...)
  * <pre>{@code
- * 
  * // Constant collections from literal elements.
  * ConstantSet<String> winners = ConstantSet.of("John Deuff", "Otto Graf", "Sim Kamil");
  * 
  * // Constant collections from existing collections.
- * ConstantSet<String> caseInsensitiveWinners 
- *     = FastSet.newSet(LEXICAL_CASE_INSENSITIVE, String.class)
- *         .addAll("John Deuff", "Otto Graf", "Sim Kamil").constant();
- *         
+ * ConstantSet<String> ordered = FastSet.newSet(Order.LEXICAL)
+ *      .addAll("John Deuff", "Otto Graf", "Sim Kamil").constant();
  * }</pre></p>
  * 
  * <p> Views are similar to <a
@@ -120,7 +116,7 @@ import org.javolution.util.internal.collection.UnmodifiableCollectionImpl;
  *     allows views to be chained in order to address the issue of class
  *     proliferation.
  * <pre>{@code
- * FastTable<String> names = FastTable.newTable(String.class).addAll("Sim Ilicuir", "Pat Ibulair");
+ * FastTable<String> names = FastTable.newTable(Equality.LEXICAL_CASE_INSENSITIVE).addAll("Sim Ilicuir", "Pat Ibulair");
  * names.subTable(0, n).clear(); // Removes the n first names (see java.util.List.subList).
  * names.distinct().add("Guy Liguili"); // Adds "Guy Liguili" only if not already present.
  * names.filter(s -> s.length > 16).clear(); // Removes all the persons with long names.
@@ -134,7 +130,7 @@ import org.javolution.util.internal.collection.UnmodifiableCollectionImpl;
  *     operations with the same benefits: Parallelism support, excellent memory
  *     characteristics (no caching, cost nothing to create), etc.
  * <pre>{@code 
- * String anyFound = names.filter(s -> s.length > 16).any(); // Sequential search (returns the first found).
+ * String anyFound = names.filter(s -> s.length > 16).any(); // Sequential search.
  * String anyFound = names.filter(s -> s.length > 16).parallel().any(); // Parallel search.
  * FastCollection<String> allFound = names.filter(s -> s.length > 16).all(); // Sequential reduction.
  * FastCollection<String> allFound = names.filter(s -> s.length > 16).parallel().all(); // Parallel reduction.
@@ -399,15 +395,14 @@ public abstract class FastCollection<E> implements Collection<E>, Serializable,
 	}
 
 	/**
-	 * Returns this collection elements through reduction. 
-	 * The collection returned has the same {@link #equality equality}
-	 * and the same basic type as this collection (e.g. a set if this 
-	 * collection is a set; a table if this collection is a table, etc.)
+	 * Returns a high-performance collection (not a view) holding the same 
+	 * elements as this collection. The collection returned has the same 
+	 * {@link #equality equality} as this collection. 
 	 */
 	@Parallel
 	@Realtime(limit = LINEAR)
 	public FastCollection<E> all() {
-		FastCollection<E> result = FastTable.newTable(equality());
+		FractalTable<E> result = new FractalTable<E>(equality());
 		result.addAll(this);
 		return result;
 	}
@@ -641,7 +636,7 @@ public abstract class FastCollection<E> implements Collection<E>, Serializable,
 			List<E> list = (List<E>) obj;
 			if (size() != list.size())
 				return false; // Short-cut.
-			Equality<? super E> cmp = Equality.DEFAULT;
+			Equality<? super E> cmp = Equality.STANDARD;
 			Iterator<E> it1 = this.iterator();
 			java.util.Iterator<E> it2 = list.iterator();
 			while (it1.hasNext()) {

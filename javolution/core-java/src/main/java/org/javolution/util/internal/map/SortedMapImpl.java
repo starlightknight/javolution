@@ -24,7 +24,7 @@ public final class SortedMapImpl<K, V> extends FastMap<K, V> {
 	/**
 	 * The entry implementation.
 	 */
-	private static final class EntryImpl<K, V> implements Entry<K, V>, Serializable {
+	private static final class EntryImpl<K, V> extends Entry<K, V> implements Serializable {
 		private static final long serialVersionUID = 0x700L; // Version.
 		public K key;
 		public V value;
@@ -40,8 +40,8 @@ public final class SortedMapImpl<K, V> extends FastMap<K, V> {
 				return false;
 			@SuppressWarnings("unchecked")
 			Entry<K, V> that = (Entry<K, V>) obj;
-			return Order.DEFAULT.areEqual(key, that.getKey())
-					&& Order.DEFAULT.areEqual(value, that.getValue());
+			return Order.ARBITRARY.areEqual(key, that.getKey())
+					&& Order.ARBITRARY.areEqual(value, that.getValue());
 		}
 
 		@Override
@@ -56,11 +56,10 @@ public final class SortedMapImpl<K, V> extends FastMap<K, V> {
 
 		@Override
 		public int hashCode() { // As per Map.Entry contract.
-			return Order.DEFAULT.indexOf(key) ^ Order.DEFAULT.indexOf(value);
+			return Order.ARBITRARY.indexOf(key) ^ Order.ARBITRARY.indexOf(value);
 		}
 
-		@Override
-		public V setValue(V newValue) {
+		V setValuePrivate(V newValue) {
 			V oldValue = value;
 			this.value = newValue;
 			return oldValue;
@@ -154,7 +153,7 @@ public final class SortedMapImpl<K, V> extends FastMap<K, V> {
 	@Override
 	public V put(K key, V value) {
         int i = entries.indexOfSorted(key, comparator);
-        if (i >= 0) return entries.get(i).setValue(value);
+        if (i >= 0) return entries.get(i).setValuePrivate(value);
 		entries.add(new EntryImpl<K,V>(key, value));
 		return null;
 	}
@@ -173,7 +172,7 @@ public final class SortedMapImpl<K, V> extends FastMap<K, V> {
 	
 	@Override
 	public Equality<? super V> valuesEquality() {
-		return Equality.DEFAULT;
+		return Equality.STANDARD;
 	}
 
 }

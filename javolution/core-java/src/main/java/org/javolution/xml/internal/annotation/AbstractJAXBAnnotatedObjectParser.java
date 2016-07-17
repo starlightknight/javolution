@@ -87,7 +87,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 		_classCacheData = new FastIdentityMap<Class<?>, CacheData>();
 		_classNameSpaceCache = new FastIdentityMap<Class<?>, String>();
 		_declaredFieldsCache = new FastIdentityMap<Class<?>,FastSet<Field>>();
-		_elementClassCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
+		_elementClassCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
 		_genericFieldTypeCache = new FastIdentityMap<Field,Class<?>>();
 		_genericMethodTypeCache = new FastIdentityMap<Method,Class<?>>();
 		_methodAttributeNameCache = new FastIdentityMap<Method,CharArray>();
@@ -97,7 +97,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 		_registeredClassesCache = new FastIdentitySet<Class<?>>();
 		_requiredCache = new FastIdentityMap<Class<?>, FastSet<CharArray>>();
 		_xmlAccessTypeCache = new FastIdentityMap<Class<?>,XmlAccessType>();
-		_xmlElementNameCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
+		_xmlElementNameCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
 		_xmlJavaTypeAdapterCache = new FastIdentityMap<Method, Class<? extends XmlAdapter>>();
 		_xmlSchemaTypeCache = new FastIdentityMap<Method,XmlSchemaTypeEnum>();
 		_xmlSeeAlsoCache = new FastIdentitySet<Class<?>>();
@@ -106,7 +106,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 		if (cacheMode == CacheMode.READER) {
 			_classElementNameCache = null;
 			_classObjectFactoryCache = new FastIdentityMap<Class<?>, Object>();
-			_namespaceObjectFactoryCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
+			_namespaceObjectFactoryCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
 			_objectFactoryCache = new FastIdentityMap<Class<?>,Method>();
 		}
 		else {
@@ -236,7 +236,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 		// Prepare Data Structures
 		final FastMap<CharArray, Method> cachedAttributeMethods = cacheData._attributeMethodsCache;
 		final FastIdentitySet<Method> cachedAttributeSet = cacheData._attributeMethodsSet;
-		final FastSet<CharArray> requiredFieldsSet = FastSet.newSet(Order.LEXICAL);
+		final FastSet<CharArray> requiredFieldsSet = FastSet.newSet(Order.CHARS_LEXICAL);
 
 		for(final Field field : fields){
 
@@ -471,7 +471,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 			final FastMap<CharArray,Field> elementFieldCache,
 			final FastMap<CharArray,Method> elementMethodCache, final Field field) throws NoSuchMethodException, NoSuchFieldException {
 		final CharArray thisXmlElementName = getXmlElementName(field);
-		final FastSet<CharArray> mappedElementsSet = FastSet.newSet(Order.LEXICAL);
+		final FastSet<CharArray> mappedElementsSet = FastSet.newSet(Order.CHARS_LEXICAL);
 		final XmlElement[] elements = xmlElements.value();
 
 		Method method ;
@@ -693,12 +693,12 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 			// Note: The reversed view logic makes sure super class prop orders appear first
 			// in the final set, and are in order going all the way down to the final implementation
 			// class.
-			propOrderSet = FastSet.newSet(Order.LEXICAL);
+			propOrderSet = FastSet.newSet(Order.CHARS_LEXICAL);
 
 			do {
 				final XmlType xmlType = thisClass.getAnnotation(XmlType.class);
 
-				final FastSet<CharArray> localPropOrderSet = FastSet.newSet(Order.LEXICAL);
+				final FastSet<CharArray> localPropOrderSet = FastSet.newSet(Order.CHARS_LEXICAL);
 
 				for(final String prop : xmlType.propOrder()){
 					localPropOrderSet.add(getXmlElementName(prop));
@@ -862,7 +862,7 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 
 		public CacheData() {
 			if(_cacheMode == CacheMode.READER) {
-				_attributeMethodsCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
+				_attributeMethodsCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
 				_attributeMethodsSet = null;
 			}
 			else {
@@ -870,12 +870,12 @@ public abstract class AbstractJAXBAnnotatedObjectParser {
 				_attributeMethodsSet = new FastIdentitySet<Method>();
 			}
 
-			_directSetValueCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
-			_elementFieldCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
-			_elementMethodCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
-			_enumValueCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
-			_mappedElementsCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
-			_propOrderMethodCache = FastMap.newMap(Order.LEXICAL, Equality.IDENTITY);
+			_directSetValueCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
+			_elementFieldCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
+			_elementMethodCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
+			_enumValueCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
+			_mappedElementsCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
+			_propOrderMethodCache = FastMap.newMap(Order.CHARS_LEXICAL, Equality.IDENTITY);
 			_xmlValueMethod = null;
 		}
 	}

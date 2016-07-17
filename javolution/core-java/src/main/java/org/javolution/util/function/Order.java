@@ -41,11 +41,11 @@ import org.javolution.util.internal.function.LexicalOrderImpl;
 public interface Order<T> extends Equality<T>, Comparator<T> {
 	
     /**
-     * A default object order (based on {@link Object#hashCode} as 32-bits 
+     * An arbitrary  object order (based on {@link Object#hashCode} as 32-bits 
      * unsigned index).
      */
     @Realtime(limit = UNKNOWN)
-    public static final Order<Object> DEFAULT = HashOrderImpl.INSTANCE;
+    public static final Order<Object> ARBITRARY = HashOrderImpl.INSTANCE;
 
     /**
      * An identity object order (based on {@link System#identityHashCode}
@@ -56,19 +56,49 @@ public interface Order<T> extends Equality<T>, Comparator<T> {
         = IdentityHashOrderImpl.INSTANCE;
 
     /**
-     * A lexicographic order for any {@link CharSequence}.
+     * A lexicographic order.
+     */
+    @Realtime(limit = LINEAR) 
+    public static final Order<String> LEXICAL
+        = null; // TODO 
+
+
+    /**
+     * A case insensitive lexicographic order.
      */
     @Realtime(limit = LINEAR)
-    public static final Order<CharSequence> LEXICAL
+    public static final Order<String> LEXICAL_CASE_INSENSITIVE 
+       = null; // TODO 
+    
+    /**
+     * A lexicographic order for any {@link CharSequence}.
+     */
+    @Realtime(limit = LINEAR) 
+    public static final Order<CharSequence> CHARS_LEXICAL
         = LexicalOrderImpl.INSTANCE;
 
+  
     /**
      * A case insensitive lexicographic order for any {@link CharSequence}.
      */
     @Realtime(limit = LINEAR)
-    public static final Order<CharSequence> LEXICAL_CASE_INSENSITIVE 
+    public static final Order<CharSequence> CHARS_LEXICAL_CASE_INSENSITIVE 
        = CaseInsensitiveLexicalOrderImpl.INSTANCE;
     
+    /**
+     * A lexicographic order for {@link String}.
+     */
+    @Realtime(limit = LINEAR)
+    public static final Order<String> STRING
+        = null; // TODO
+
+    /**
+     * A case insensitive lexicographic order for {@link String}.
+     */
+    @Realtime(limit = LINEAR)
+    public static final Order<String> STRING_CASE_INSENSITIVE 
+       = null; // TODO
+
     /**
      * A numeric order based on {@link Number#doubleValue()}.
      */

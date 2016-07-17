@@ -13,7 +13,6 @@ import java.io.Reader;
 import java.util.Map;
 
 import org.javolution.util.FastTable;
-import org.javolution.util.FractalTable;
 import org.javolution.xml.stream.XMLInputFactory;
 import org.javolution.xml.stream.XMLStreamException;
 
@@ -22,7 +21,7 @@ import org.javolution.xml.stream.XMLStreamException;
  */
 public final class XMLInputFactoryImpl implements XMLInputFactory {
     private Map<String, String> _entities = null;
-    private FastTable<XMLStreamReaderImpl> _recycled = new FractalTable<XMLStreamReaderImpl>().shared();
+    private FastTable<XMLStreamReaderImpl> _recycled = FastTable.newTable().shared().unchecked();
 
     // Implements XMLInputFactory abstract method.
     public XMLStreamReaderImpl createXMLStreamReader(InputStream stream)
@@ -97,7 +96,7 @@ public final class XMLInputFactoryImpl implements XMLInputFactory {
     public XMLInputFactory clone() {
         try {
             XMLInputFactoryImpl clone = (XMLInputFactoryImpl) super.clone();
-            clone._recycled = new FractalTable<XMLStreamReaderImpl>().shared();
+            clone._recycled = FastTable.newTable().shared().unchecked();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new Error();// Cannot happen since cloneable.

@@ -79,7 +79,7 @@ public final class Text implements CharSequence, Comparable<CharSequence>,
 	/**
 	 * Holds the texts interned in immortal memory.
 	 */
-	private static final FastMap<Text, Text> INTERN = FastMap.newMap(Order.LEXICAL);
+	private static final FastMap<Text, Text> INTERN = FastMap.newMap(Order.CHARS_LEXICAL);
 
 	/**
 	 * Holds an empty character sequence.
@@ -854,7 +854,7 @@ public final class Text implements CharSequence, Comparable<CharSequence>,
 	 *          <code>CharSequence</code> or a <code>String</code>.
 	 */
 	public int compareTo(CharSequence csq) {
-		return Order.LEXICAL.compare(this, csq);
+		return Order.CHARS_LEXICAL.compare(this, csq);
 	}
 
 	/**

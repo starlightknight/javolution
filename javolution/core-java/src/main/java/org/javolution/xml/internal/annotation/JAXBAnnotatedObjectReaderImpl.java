@@ -299,7 +299,7 @@ public class JAXBAnnotatedObjectReaderImpl extends AbstractJAXBAnnotatedObjectPa
 		AnnotationStackData stackData;
 		if(_isValidating){
 			stackData = new AnnotationStackData(AnnotationStackType.ROOT, null, outputObject, null, inputClass, null,
-					FastSet.newSet(Order.LEXICAL), getXmlPropOrder(inputClass));
+					FastSet.newSet(Order.CHARS_LEXICAL), getXmlPropOrder(inputClass));
 		}
 		else {
 			stackData = new AnnotationStackData(AnnotationStackType.ROOT, null, outputObject, null, inputClass, null, null, null);
@@ -1153,7 +1153,7 @@ public class JAXBAnnotatedObjectReaderImpl extends AbstractJAXBAnnotatedObjectPa
 				_processedSet = null;
 			}
 			else {
-				_processedSet = FastSet.newSet(Order.LEXICAL);
+				_processedSet = FastSet.newSet(Order.CHARS_LEXICAL);
 			}
 		}
 

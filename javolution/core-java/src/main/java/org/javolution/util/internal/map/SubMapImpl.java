@@ -98,9 +98,8 @@ public final class SubMapImpl<K, V> extends FastMap<K, V> {
 				inner.floorEntry(fromKey) : inner.lowerEntry(fromKey);
 	}
 
-
 	@Override
-	public java.util.Map.Entry<K, V> lowerEntry(K key) {
+	public Entry<K, V> lowerEntry(K key) {
 		Entry<K,V> entry = inner.lowerEntry(key);
 		if ((entry == null) || !inRange(entry.getKey())) return null;
 		return entry;
